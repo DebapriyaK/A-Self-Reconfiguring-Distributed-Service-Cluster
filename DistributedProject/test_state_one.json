@@ -1,0 +1,16 @@
+{
+  "active_nodes": {
+    "nodeX": {
+      "last_seen": 1775709583.069859,
+      "addr": [
+        "127.0.0.1",
+        57897
+      ],
+      "load": 2
+    }
+  },
+  "pending_count": 0,
+  "in_flight_count": 2,
+  "completed_count": 1,
+  "timestamp": 1775709583.069859
+}

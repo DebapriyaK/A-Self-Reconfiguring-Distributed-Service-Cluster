@@ -1,0 +1,58 @@
+--- SELF-RECONFIGURING CLUSTER MONITOR ONLINE ---
+[CONFIG] heartbeat_timeout=4.0s task_interval=0.7s max_in_flight_per_node=2
+[JOINED] Node nodeA joined. Active nodes=1
+[INGRESS] Received new workload TASK-0001 (work_units=2). Queue=1
+[BALANCER] Assigned TASK-0001 to nodeA (node_load=1, queue=0)
+[STATUS] nodes=1 queue=0 in_flight=1 completed=0
+[JOINED] Node nodeB joined. Active nodes=2
+[JOINED] Node nodeC joined. Active nodes=3
+[INGRESS] Received new workload TASK-0002 (work_units=3). Queue=1
+[BALANCER] Assigned TASK-0002 to nodeB (node_load=1, queue=0)
+[INGRESS] Received new workload TASK-0003 (work_units=4). Queue=1
+[BALANCER] Assigned TASK-0003 to nodeC (node_load=1, queue=0)
+[DONE] TASK-0001 finished by nodeA. Completed=1 InFlight=2
+[INGRESS] Received new workload TASK-0004 (work_units=1). Queue=1
+[BALANCER] Assigned TASK-0004 to nodeA (node_load=1, queue=0)
+[DONE] TASK-0002 finished by nodeB. Completed=2 InFlight=2
+[INGRESS] Received new workload TASK-0005 (work_units=2). Queue=1
+[BALANCER] Assigned TASK-0005 to nodeB (node_load=1, queue=0)
+[STATUS] nodes=3 queue=0 in_flight=3 completed=2
+[DONE] TASK-0004 finished by nodeA. Completed=3 InFlight=2
+[INGRESS] Received new workload TASK-0006 (work_units=3). Queue=1
+[BALANCER] Assigned TASK-0006 to nodeA (node_load=1, queue=0)
+[INGRESS] Received new workload TASK-0007 (work_units=4). Queue=1
+[BALANCER] Assigned TASK-0007 to nodeA (node_load=2, queue=0)
+[DONE] TASK-0005 finished by nodeB. Completed=4 InFlight=3
+[INGRESS] Received new workload TASK-0008 (work_units=1). Queue=1
+[BALANCER] Assigned TASK-0008 to nodeB (node_load=1, queue=0)
+[DONE] TASK-0006 finished by nodeA. Completed=5 InFlight=3
+[INGRESS] Received new workload TASK-0009 (work_units=2). Queue=1
+[FAILURE] Node nodeC timed out. Starting autonomous reconfiguration.
+[RECOVERY] Requeued TASK-0003 from failed node nodeC.
+[RECONFIGURED] Cluster size=2. Queue=2.
+[BALANCER] Assigned TASK-0003 to nodeB (node_load=1, queue=1)
+[BALANCER] Assigned TASK-0009 to nodeA (node_load=2, queue=0)
+[STATUS] nodes=2 queue=0 in_flight=4 completed=5
+[DONE] TASK-0008 finished by nodeB. Completed=6 InFlight=3
+[INGRESS] Received new workload TASK-0010 (work_units=3). Queue=1
+[BALANCER] Assigned TASK-0010 to nodeA (node_load=2, queue=0)
+[INGRESS] Received new workload TASK-0011 (work_units=4). Queue=1
+[BALANCER] Assigned TASK-0011 to nodeB (node_load=2, queue=0)
+[DONE] TASK-0007 finished by nodeA. Completed=7 InFlight=4
+[DONE] TASK-0009 finished by nodeA. Completed=8 InFlight=3
+[INGRESS] Received new workload TASK-0012 (work_units=1). Queue=1
+[BALANCER] Assigned TASK-0012 to nodeA (node_load=2, queue=0)
+[DONE] TASK-0003 finished by nodeB. Completed=9 InFlight=3
+[INGRESS] Received new workload TASK-0013 (work_units=2). Queue=1
+[BALANCER] Assigned TASK-0013 to nodeA (node_load=2, queue=0)
+[STATUS] nodes=2 queue=0 in_flight=4 completed=9
+[DONE] TASK-0010 finished by nodeA. Completed=10 InFlight=3
+[DONE] TASK-0012 finished by nodeA. Completed=11 InFlight=2
+[INGRESS] Received new workload TASK-0014 (work_units=3). Queue=1
+[BALANCER] Assigned TASK-0014 to nodeA (node_load=2, queue=0)
+[DONE] TASK-0011 finished by nodeB. Completed=12 InFlight=2
+[INGRESS] Received new workload TASK-0015 (work_units=4). Queue=1
+[BALANCER] Assigned TASK-0015 to nodeB (node_load=1, queue=0)
+[DONE] TASK-0013 finished by nodeA. Completed=13 InFlight=2
+[INGRESS] Received new workload TASK-0016 (work_units=1). Queue=1
+[BALANCER] Assigned TASK-0016 to nodeA (node_load=2, queue=0)
