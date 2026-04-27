@@ -1,6 +1,7 @@
 import json
 import os
 import socket
+import sys
 import time
 
 node_name = os.environ.get("HOSTNAME", "Unknown_Node")
@@ -9,6 +10,8 @@ monitor_port = int(os.environ.get("MONITOR_PORT", "5005"))
 heartbeat_interval_seconds = float(os.environ.get("HEARTBEAT_INTERVAL_SECONDS", "1.0"))
 work_unit_duration_seconds = float(os.environ.get("WORK_UNIT_DURATION_SECONDS", "1.3"))
 crash_after_seconds = float(os.environ.get("CRASH_AFTER_SECONDS", "0"))
+leaving_after_seconds = float(os.environ.get("LEAVING_AFTER_SECONDS", "0"))
+node_capacity = int(os.environ.get("NODE_CAPACITY", "2"))
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(("0.0.0.0", 0))
@@ -23,6 +26,7 @@ active_tasks = {}
 
 last_heartbeat_at = 0.0
 started_at = time.time()
+leaving_sent = False
 
 
 def send_json(payload):
@@ -30,7 +34,12 @@ def send_json(payload):
 
 
 def send_heartbeat():
-    send_json({"type": "HEARTBEAT", "node_id": node_name, "load": len(active_tasks)})
+    send_json({
+        "type": "HEARTBEAT",
+        "node_id": node_name,
+        "load": len(active_tasks),
+        "capacity": node_capacity,
+    })
 
 
 def handle_assignment(message):
@@ -92,15 +101,24 @@ def tick_tasks():
             )
 
 
-print(f"[{node_name}] Node online. Sending heartbeats to {monitor_host}:{monitor_port}")
+print(f"[{node_name}] Node online. Sending heartbeats to {monitor_host}:{monitor_port} "
+      f"(capacity={node_capacity})")
 
 while True:
     current = time.time()
 
-    # Simulated crash -- used by chaos node and test cases
+    # Hard crash simulation -- used by chaos node and test cases
     if crash_after_seconds > 0 and (current - started_at) >= crash_after_seconds:
         print(f"[{node_name}] Simulated crash triggered after {crash_after_seconds}s.")
         os._exit(1)
+
+    # Graceful shutdown simulation -- sends LEAVING before exiting
+    if leaving_after_seconds > 0 and not leaving_sent and (current - started_at) >= leaving_after_seconds:
+        send_json({"type": "LEAVING", "node_id": node_name})
+        print(f"[{node_name}] Sent graceful LEAVING message. Shutting down.")
+        leaving_sent = True
+        time.sleep(0.3)  # brief pause so the UDP packet reaches the monitor
+        sys.exit(0)
 
     if current - last_heartbeat_at >= heartbeat_interval_seconds:
         send_heartbeat()

@@ -10,15 +10,17 @@ LIVENESS_CHECK_INTERVAL_SECONDS = float(os.environ.get("LIVENESS_CHECK_INTERVAL_
 TASK_GENERATION_INTERVAL_SECONDS = float(os.environ.get("TASK_GENERATION_INTERVAL_SECONDS", "1.2"))
 MAX_IN_FLIGHT_PER_NODE = int(os.environ.get("MAX_IN_FLIGHT_PER_NODE", "2"))
 STATE_SNAPSHOT_FILE = os.environ.get("STATE_SNAPSHOT_FILE", "cluster_state.json")
+MAX_RETRIES = int(os.environ.get("MAX_RETRIES", "3"))
+TASK_ASSIGN_TIMEOUT_SECONDS = float(os.environ.get("TASK_ASSIGN_TIMEOUT_SECONDS", "10.0"))
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(("0.0.0.0", PORT))
 sock.settimeout(0.5)
 
-# node_id -> {"last_seen": float, "addr": (host, port), "load": int}
+# node_id -> {"last_seen": float, "addr": (host, port), "load": int, "capacity": int}
 active_nodes = {}
 
-# task_id -> {"task_id": str, "work_units": int}
+# task_id -> {"task_id": str, "work_units": int, "retries": int}
 pending_tasks = deque()
 
 # task_id -> {
@@ -31,6 +33,9 @@ in_flight_tasks = {}
 
 # task_id -> {"task_id": str, "node_id": str, "finished_at": float}
 completed_tasks = []
+
+# task_id -> {"task_id": str, "reason": str, "failed_at": float}
+failed_tasks = []
 
 task_counter = 0
 last_task_generated_at = 0.0
@@ -52,6 +57,7 @@ def snapshot_state():
         "pending_count": len(pending_tasks),
         "in_flight_count": len(in_flight_tasks),
         "completed_count": len(completed_tasks),
+        "failed_count": len(failed_tasks),
         "timestamp": now(),
     }
     with open(STATE_SNAPSHOT_FILE, "w", encoding="utf-8") as f:
@@ -64,6 +70,7 @@ def enqueue_task():
     task = {
         "task_id": f"TASK-{task_counter:04d}",
         "work_units": 1 + (task_counter % 4),
+        "retries": 0,
     }
     pending_tasks.append(task)
     print(
@@ -75,16 +82,18 @@ def enqueue_task():
 def least_loaded_alive_node():
     """
     Least-Connections algorithm: return the node with the lowest current load
-    that has not yet hit the per-node in-flight cap.
+    that has not yet hit its per-node capacity.
+
+    Each node advertises its own capacity via heartbeat (NODE_CAPACITY env var).
+    Falls back to MAX_IN_FLIGHT_PER_NODE for nodes that haven't reported capacity.
 
     Sorting by (load, node_id) gives deterministic tie-breaking -- among
-    equally loaded nodes the alphabetically first name wins.  This keeps
-    the assignment order predictable for tests.
+    equally loaded nodes the alphabetically first name wins.
     """
     candidates = [
         (node_id, node_state["load"])
         for node_id, node_state in active_nodes.items()
-        if node_state["load"] < MAX_IN_FLIGHT_PER_NODE
+        if node_state["load"] < node_state.get("capacity", MAX_IN_FLIGHT_PER_NODE)
     ]
     if not candidates:
         return None
@@ -105,7 +114,7 @@ def assign_tasks():
             "task": task,
             "node_id": node_id,
             "assigned_at": now(),
-            "units_done": 0,      # checkpoint counter -- updated by TASK_PROGRESS
+            "units_done": 0,
         }
         send_json(
             node_state["addr"],
@@ -118,19 +127,22 @@ def assign_tasks():
         )
 
 
-def fail_node(node_id):
+def fail_node(node_id, graceful=False):
     """
-    Called when a node's heartbeat has not been seen for HEARTBEAT_TIMEOUT_SECONDS.
+    Called when a node's heartbeat times out (graceful=False) or the node
+    sends a LEAVING message (graceful=True).
 
-    For every task that was in-flight on the dead node:
-      - Read the checkpoint (units_done) that was last reported via TASK_PROGRESS.
+    For every task in-flight on the dead/leaving node:
+      - Read the checkpoint (units_done).
       - Compute remaining = original_work_units - units_done.
-      - If remaining > 0: requeue with only the remaining units so the next
-        node does NOT redo work that was already completed (checkpointing).
-      - If remaining == 0: the node finished all units but the TASK_DONE
-        message was lost in the crash.  Count it as completed anyway.
+      - If remaining > 0 and retries < MAX_RETRIES: requeue with remaining units.
+      - If remaining > 0 and retries >= MAX_RETRIES: mark permanently failed.
+      - If remaining == 0: all units done but TASK_DONE was lost. Count as complete.
     """
-    print(f"[FAILURE] Node {node_id} timed out. Starting autonomous reconfiguration.")
+    if graceful:
+        print(f"[LEAVING] Node {node_id} sent graceful shutdown. Reassigning tasks immediately.")
+    else:
+        print(f"[FAILURE] Node {node_id} timed out. Starting autonomous reconfiguration.")
 
     stranded_task_ids = [
         task_id
@@ -143,10 +155,9 @@ def fail_node(node_id):
         original_task = task_state["task"]
         units_done = task_state["units_done"]
         remaining = original_task["work_units"] - units_done
+        retries = original_task.get("retries", 0)
 
         if remaining <= 0:
-            # Edge case: all units were finished but TASK_DONE was never received
-            # (node crashed between completing the last unit and sending TASK_DONE).
             completed_tasks.append({
                 "task_id": task_id,
                 "node_id": node_id,
@@ -156,17 +167,26 @@ def fail_node(node_id):
                 f"[RECOVERY] {task_id}: all {original_task['work_units']} units were done "
                 f"on {node_id} before crash. Marking complete."
             )
+        elif retries >= MAX_RETRIES:
+            failed_tasks.append({
+                "task_id": task_id,
+                "reason": f"exceeded {MAX_RETRIES} retries",
+                "failed_at": now(),
+            })
+            print(
+                f"[FAILED] {task_id}: exceeded {MAX_RETRIES} retries. Task permanently failed."
+            )
         else:
-            # Build a partial task -- only the remaining work units
             partial_task = {
                 "task_id": task_id,
                 "work_units": remaining,
+                "retries": retries + 1,
             }
-            pending_tasks.appendleft(partial_task)  # priority re-insertion at front
+            pending_tasks.appendleft(partial_task)
             print(
                 f"[RECOVERY] Requeued {task_id} from failed node {node_id}. "
                 f"({units_done}/{original_task['work_units']} units done, "
-                f"{remaining} remaining)"
+                f"{remaining} remaining, retry {retries + 1}/{MAX_RETRIES})"
             )
 
     del active_nodes[node_id]
@@ -183,6 +203,42 @@ def check_liveness():
     for node_id in dead_nodes:
         fail_node(node_id)
 
+    # Detect TASK_ASSIGN packets silently dropped by UDP:
+    # A task in-flight with zero progress for longer than TASK_ASSIGN_TIMEOUT_SECONDS
+    # likely never arrived at the node — resend by requeuing.
+    stuck_task_ids = [
+        task_id
+        for task_id, ts in in_flight_tasks.items()
+        if ts["units_done"] == 0
+        and ts["node_id"] in active_nodes
+        and current - ts["assigned_at"] > TASK_ASSIGN_TIMEOUT_SECONDS
+    ]
+    for task_id in stuck_task_ids:
+        task_state = in_flight_tasks.pop(task_id)
+        node_id = task_state["node_id"]
+        if node_id in active_nodes:
+            active_nodes[node_id]["load"] = max(0, active_nodes[node_id]["load"] - 1)
+        original_task = task_state["task"]
+        retries = original_task.get("retries", 0)
+        if retries >= MAX_RETRIES:
+            failed_tasks.append({
+                "task_id": task_id,
+                "reason": "assign timeout, max retries exceeded",
+                "failed_at": now(),
+            })
+            print(f"[FAILED] {task_id}: TASK_ASSIGN timed out after {MAX_RETRIES} retries.")
+        else:
+            retry_task = {
+                "task_id": task_id,
+                "work_units": original_task["work_units"],
+                "retries": retries + 1,
+            }
+            pending_tasks.appendleft(retry_task)
+            print(
+                f"[ASSIGN-TIMEOUT] {task_id} on {node_id}: no progress after "
+                f"{TASK_ASSIGN_TIMEOUT_SECONDS}s. Requeuing (retry {retries + 1}/{MAX_RETRIES})."
+            )
+
 
 def handle_message(raw_data, addr):
     message = json.loads(raw_data.decode("utf-8"))
@@ -192,14 +248,33 @@ def handle_message(raw_data, addr):
     if msg_type == "HEARTBEAT":
         node_id = message["node_id"]
         observed_load = int(message.get("load", 0))
-        was_new = node_id not in active_nodes
-        active_nodes[node_id] = {
-            "last_seen": current,
-            "addr": addr,
-            "load": observed_load,
-        }
-        if was_new:
-            print(f"[JOINED] Node {node_id} joined. Active nodes={len(active_nodes)}")
+        capacity = int(message.get("capacity", MAX_IN_FLIGHT_PER_NODE))
+        if node_id not in active_nodes:
+            active_nodes[node_id] = {
+                "last_seen": current,
+                "addr": addr,
+                "load": observed_load,
+                "capacity": capacity,
+            }
+            print(f"[JOINED] Node {node_id} joined (capacity={capacity}). Active nodes={len(active_nodes)}")
+        else:
+            node_state = active_nodes[node_id]
+            node_state["last_seen"] = current
+            node_state["addr"] = addr
+            # Never let a heartbeat decrease the tracked load. A stale heartbeat
+            # (sent before the node received a TASK_ASSIGN packet) would report a
+            # lower load than reality, which could cause the monitor to assign a
+            # second task to a node already at capacity. Taking max() prevents the
+            # rollback while still allowing upward correction if the monitor somehow
+            # underestimated (e.g. a TASK_DONE message was lost).
+            node_state["load"] = max(node_state["load"], observed_load)
+            node_state["capacity"] = capacity
+        return
+
+    if msg_type == "LEAVING":
+        node_id = message["node_id"]
+        if node_id in active_nodes:
+            fail_node(node_id, graceful=True)
         return
 
     if msg_type == "TASK_PROGRESS":
@@ -242,7 +317,8 @@ print("--- SELF-RECONFIGURING CLUSTER MONITOR ONLINE ---")
 print(
     f"[CONFIG] heartbeat_timeout={HEARTBEAT_TIMEOUT_SECONDS}s "
     f"task_interval={TASK_GENERATION_INTERVAL_SECONDS}s "
-    f"max_in_flight_per_node={MAX_IN_FLIGHT_PER_NODE}"
+    f"max_in_flight_per_node={MAX_IN_FLIGHT_PER_NODE} "
+    f"max_retries={MAX_RETRIES}"
 )
 
 while True:
@@ -272,6 +348,7 @@ while True:
         snapshot_state()
         print(
             f"[STATUS] nodes={len(active_nodes)} queue={len(pending_tasks)} "
-            f"in_flight={len(in_flight_tasks)} completed={len(completed_tasks)}"
+            f"in_flight={len(in_flight_tasks)} completed={len(completed_tasks)} "
+            f"failed={len(failed_tasks)}"
         )
         last_summary_at = current

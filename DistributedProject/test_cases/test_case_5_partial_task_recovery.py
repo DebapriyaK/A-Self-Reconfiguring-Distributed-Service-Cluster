@@ -143,7 +143,7 @@ def run():
 
     partial_match = re.search(
         r"\[RECOVERY\] Requeued TASK-0003 from failed node nodeC\. "
-        r"\((\d+)/4 units done, (\d+) remaining\)",
+        r"\((\d+)/4 units done, (\d+) remaining",
         logs,
     )
     if partial_match:
