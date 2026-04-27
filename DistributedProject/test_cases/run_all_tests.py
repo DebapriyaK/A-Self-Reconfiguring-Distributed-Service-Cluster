@@ -1,14 +1,18 @@
 """
 Run All Test Cases
 ==================
-Runs TC1 → TC4 sequentially and prints a final summary.
+Runs TC1 → TC5 sequentially and prints a final summary.
 Each test uses a different port so they never collide.
 
-Usage:
+Usage (from the DistributedProject folder):
     python test_cases/run_all_tests.py
 
 Or run any single test on its own:
     python test_cases/test_case_1_single_node_failure.py
+    python test_cases/test_case_2_two_nodes_simultaneous_crash.py
+    python test_cases/test_case_3_full_outage_and_recovery.py
+    python test_cases/test_case_4_load_balancing.py
+    python test_cases/test_case_5_partial_task_recovery.py
 """
 
 import importlib.util
@@ -17,13 +21,18 @@ import time
 from pathlib import Path
 
 TESTS = [
-    ("TC1 — Single Node Failure Mid-Task",          "test_case_1_single_node_failure"),
-    ("TC2 — Two Nodes Crash Simultaneously",         "test_case_2_two_nodes_simultaneous_crash"),
-    ("TC3 — Full Outage Then New Node Joins",        "test_case_3_full_outage_and_recovery"),
-    ("TC4 — Load Balancing Verification",            "test_case_4_load_balancing"),
+    ("TC1 — Single Node Failure Mid-Task",             "test_case_1_single_node_failure"),
+    ("TC2 — Two Nodes Crash Simultaneously",            "test_case_2_two_nodes_simultaneous_crash"),
+    ("TC3 — Full Outage Then New Node Joins",           "test_case_3_full_outage_and_recovery"),
+    ("TC4 — Load Balancing Verification",               "test_case_4_load_balancing"),
+    ("TC5 — Partial Task Recovery via Checkpointing",   "test_case_5_partial_task_recovery"),
 ]
 
 HERE = Path(__file__).parent
+
+# Ensure helpers.py is importable when test modules are loaded via importlib
+if str(HERE) not in sys.path:
+    sys.path.insert(0, str(HERE))
 
 
 def load_and_run(module_filename):
@@ -40,7 +49,7 @@ def main():
     print("║     Self-Reconfiguring Cluster — Full Test Suite         ║")
     print("╚══════════════════════════════════════════════════════════╝")
     print()
-    print("Tests run sequentially. Total runtime ≈ 2 minutes.")
+    print("Tests run sequentially. Total runtime ≈ 2.5 minutes.")
     print()
 
     results = []

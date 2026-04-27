@@ -24,50 +24,20 @@ Expected output markers:
 
 import json
 import os
-import subprocess
 import sys
-import threading
 import time
 from pathlib import Path
 
-# monitor.py and node.py live one level up from this file
 ROOT = Path(__file__).parent.parent
 STATE_FILE = ROOT / "tc1_state.json"
 LOG_FILE = ROOT / "tc1_monitor.log"
-
-# Use a unique port so this test never collides with other tests or Docker
 PORT = "5101"
 
+sys.path.insert(0, str(Path(__file__).parent))
+from helpers import kill_all, start_monitored, start_process
 
-# ── helpers ──────────────────────────────────────────────────────────────────
-
-def _stream(process, lines):
-    for line in iter(process.stdout.readline, ""):
-        lines.append(line)
-    process.stdout.close()
-
-
-def _start(cmd, env):
-    return subprocess.Popen(
-        cmd, cwd=ROOT, env=env,
-        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
-    )
-
-
-def _kill(processes):
-    for p in processes:
-        p.terminate()
-    for p in processes:
-        try:
-            p.wait(timeout=3)
-        except subprocess.TimeoutExpired:
-            p.kill()
-
-
-# ── test ─────────────────────────────────────────────────────────────────────
 
 def run():
-    # Clean up leftover files from any previous run
     for f in (STATE_FILE, LOG_FILE):
         if f.exists():
             f.unlink()
@@ -84,10 +54,8 @@ def run():
     })
 
     monitor_lines = []
-    monitor = _start([sys.executable, "-u", "monitor.py"], base_env)
-    threading.Thread(target=_stream, args=(monitor, monitor_lines), daemon=True).start()
+    monitor = start_monitored([sys.executable, "-u", "monitor.py"], base_env, ROOT, monitor_lines)
 
-    # Give monitor a moment to bind its socket before nodes try to connect
     time.sleep(0.5)
 
     node_processes = []
@@ -100,10 +68,9 @@ def run():
         env["WORK_UNIT_DURATION_SECONDS"] = "2.0"
         if name == "nodeC":
             env["CRASH_AFTER_SECONDS"] = "3"
-        node_processes.append(_start([sys.executable, "-u", "node.py"], env))
-        threading.Thread(
-            target=_stream, args=(node_processes[-1], []), daemon=True
-        ).start()
+        node_processes.append(
+            start_monitored([sys.executable, "-u", "node.py"], env, ROOT, [])
+        )
 
     # Timeline:
     #   t=0   : nodes start
@@ -111,14 +78,12 @@ def run():
     #   t=7   : monitor detects nodeC (3s crash + 4s timeout)
     #   t=7   : TASK-0003 requeued, assigned to nodeA or nodeB
     #   t=~15 : reassigned TASK-0003 finishes (up to 8s after reassignment)
-    # Run 28s to comfortably capture all events
     print("Running test... (28 seconds)")
     time.sleep(28)
 
-    _kill(node_processes + [monitor])
+    kill_all(node_processes + [monitor])
     LOG_FILE.write_text("".join(monitor_lines), encoding="utf-8")
 
-    # ── assertions ────────────────────────────────────────────────────────────
     logs = "".join(monitor_lines)
 
     if not STATE_FILE.exists():
@@ -136,37 +101,32 @@ def run():
 
     passed = True
 
-    # 1. nodeC failure must have been detected
     if "[FAILURE] Node nodeC timed out." in logs:
         print("  PASS  nodeC failure detected by heartbeat timeout.")
     else:
         print("  FAIL  nodeC failure was NOT detected.")
         passed = False
 
-    # 2. The stranded task must have been requeued
     if "[RECOVERY] Requeued" in logs and "from failed node nodeC" in logs:
         print("  PASS  Stranded task requeued from nodeC.")
     else:
         print("  FAIL  No task requeue from nodeC found in logs.")
         passed = False
 
-    # 3. Cluster reconfigured to 2 nodes
     if "[RECONFIGURED] Cluster size=2." in logs:
         print("  PASS  Cluster reconfigured to size=2.")
     else:
         print("  FAIL  Cluster reconfiguration log line not found.")
         passed = False
 
-    # 4. Healthy nodes kept completing tasks after failure
     if completed >= 3:
         print(f"  PASS  {completed} tasks completed (>= 3 required).")
     else:
         print(f"  FAIL  Only {completed} tasks completed (need >= 3).")
         passed = False
 
-    # 5. Exactly 2 nodes remain active
     if active_count == 2:
-        print(f"  PASS  2 active nodes remain after nodeC crash.")
+        print("  PASS  2 active nodes remain after nodeC crash.")
     else:
         print(f"  FAIL  Expected 2 active nodes, found {active_count}.")
         passed = False

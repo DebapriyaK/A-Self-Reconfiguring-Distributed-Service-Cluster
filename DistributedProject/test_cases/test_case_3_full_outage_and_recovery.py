@@ -34,9 +34,7 @@ Expected output markers:
 
 import json
 import os
-import subprocess
 import sys
-import threading
 import time
 from pathlib import Path
 
@@ -45,28 +43,8 @@ STATE_FILE = ROOT / "tc3_state.json"
 LOG_FILE = ROOT / "tc3_monitor.log"
 PORT = "5103"
 
-
-def _stream(process, lines):
-    for line in iter(process.stdout.readline, ""):
-        lines.append(line)
-    process.stdout.close()
-
-
-def _start(cmd, env):
-    return subprocess.Popen(
-        cmd, cwd=ROOT, env=env,
-        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
-    )
-
-
-def _kill(processes):
-    for p in processes:
-        p.terminate()
-    for p in processes:
-        try:
-            p.wait(timeout=3)
-        except subprocess.TimeoutExpired:
-            p.kill()
+sys.path.insert(0, str(Path(__file__).parent))
+from helpers import kill_all, start_monitored
 
 
 def run():
@@ -86,48 +64,40 @@ def run():
     })
 
     monitor_lines = []
-    monitor = _start([sys.executable, "-u", "monitor.py"], base_env)
-    threading.Thread(target=_stream, args=(monitor, monitor_lines), daemon=True).start()
+    monitor = start_monitored([sys.executable, "-u", "monitor.py"], base_env, ROOT, monitor_lines)
 
     time.sleep(0.5)
 
-    # Phase 1: start the 3 nodes that will all crash
     initial_nodes = []
     for name in ("nodeA", "nodeB", "nodeC"):
         env = base_env.copy()
         env["HOSTNAME"] = name
         env["MONITOR_HOST"] = "127.0.0.1"
         env["WORK_UNIT_DURATION_SECONDS"] = "3.0"
-        env["CRASH_AFTER_SECONDS"] = "5"   # all crash at 5s
-        initial_nodes.append(_start([sys.executable, "-u", "node.py"], env))
-        threading.Thread(
-            target=_stream, args=(initial_nodes[-1], []), daemon=True
-        ).start()
+        env["CRASH_AFTER_SECONDS"] = "5"
+        initial_nodes.append(
+            start_monitored([sys.executable, "-u", "node.py"], env, ROOT, [])
+        )
 
-    # Wait until all 3 are dead and the monitor has detected all 3 failures.
-    # t=5: all crash. t=9: monitor detects last one (5+4 timeout).
-    # Then wait 8 more seconds for the queue to build up with no workers.
+    # t=5: all crash. t=9: monitor detects last one. Wait 8 more for queue build-up.
     print("Phase 1: waiting for full cluster outage... (17 seconds)")
     time.sleep(17)
 
-    # Snapshot the queue depth at the moment of outage to verify backlog built up
     pre_recovery_pending = None
     if STATE_FILE.exists():
         snap = json.loads(STATE_FILE.read_text(encoding="utf-8"))
         pre_recovery_pending = snap.get("pending_count", 0)
 
-    # Phase 2: start a single new node (nodeD) -- simulates capacity returning
     print("Phase 2: nodeD joins the cluster (backlog drains)... (18 seconds)")
     env_d = base_env.copy()
     env_d["HOSTNAME"] = "nodeD"
     env_d["MONITOR_HOST"] = "127.0.0.1"
     env_d["WORK_UNIT_DURATION_SECONDS"] = "1.5"
-    node_d = _start([sys.executable, "-u", "node.py"], env_d)
-    threading.Thread(target=_stream, args=(node_d, []), daemon=True).start()
+    node_d = start_monitored([sys.executable, "-u", "node.py"], env_d, ROOT, [])
 
     time.sleep(18)
 
-    _kill(initial_nodes + [node_d, monitor])
+    kill_all(initial_nodes + [node_d, monitor])
     LOG_FILE.write_text("".join(monitor_lines), encoding="utf-8")
 
     logs = "".join(monitor_lines)
@@ -147,16 +117,13 @@ def run():
 
     passed = True
 
-    # 1. All 3 original nodes must have been detected as failed
     for name in ("nodeA", "nodeB", "nodeC"):
-        marker = f"[FAILURE] Node {name} timed out."
-        if marker in logs:
+        if f"[FAILURE] Node {name} timed out." in logs:
             print(f"  PASS  {name} failure detected.")
         else:
             print(f"  FAIL  {name} failure was NOT detected.")
             passed = False
 
-    # 2. Pending queue had tasks queued during the outage (proved backlog built up)
     if pre_recovery_pending is not None and pre_recovery_pending > 0:
         print(f"  PASS  Queue had {pre_recovery_pending} pending tasks during full outage.")
     elif pre_recovery_pending == 0:
@@ -164,29 +131,24 @@ def run():
     else:
         print("  WARN  Could not read queue depth during outage.")
 
-    # 3. nodeD joined successfully
     if "[JOINED] Node nodeD joined." in logs:
         print("  PASS  nodeD successfully joined the cluster after outage.")
     else:
         print("  FAIL  nodeD did not join the cluster.")
         passed = False
 
-    # 4. Tasks were assigned to nodeD (queue drained)
-    nodeD_assignments = logs.count("Assigned TASK-") and "to nodeD" in logs
     if "to nodeD" in logs:
         print("  PASS  Monitor assigned queued tasks to nodeD.")
     else:
         print("  FAIL  No tasks assigned to nodeD.")
         passed = False
 
-    # 5. Completions happened after recovery
     if completed >= 3:
         print(f"  PASS  {completed} tasks completed after full outage recovery.")
     else:
         print(f"  FAIL  Only {completed} tasks completed (need >= 3).")
         passed = False
 
-    # 6. nodeD is the only active node
     if active_count == 1:
         print("  PASS  Exactly 1 active node remains (nodeD).")
     else:

@@ -161,7 +161,6 @@ def fail_node(node_id):
             partial_task = {
                 "task_id": task_id,
                 "work_units": remaining,
-                "original_work_units": original_task["work_units"],
             }
             pending_tasks.appendleft(partial_task)  # priority re-insertion at front
             print(
@@ -204,13 +203,6 @@ def handle_message(raw_data, addr):
         return
 
     if msg_type == "TASK_PROGRESS":
-        """
-        A node completed one more work-unit and is reporting its progress.
-        We update the checkpoint counter in in_flight_tasks.
-        The node_id check prevents a stale TASK_PROGRESS from a dead node
-        (arriving late via UDP) from overwriting the checkpoint of the new
-        node that has already taken over the task.
-        """
         task_id = message["task_id"]
         node_id = message["node_id"]
         units_done = int(message.get("units_done", 0))

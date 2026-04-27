@@ -36,7 +36,6 @@ def send_heartbeat():
 def handle_assignment(message):
     task_id = message["task_id"]
     work_units = int(message.get("work_units", 1))
-    # Schedule the first unit to finish after one work_unit_duration
     active_tasks[task_id] = {
         "total_units": work_units,
         "units_done": 0,
@@ -72,7 +71,6 @@ def tick_tasks():
         units_done = state["units_done"]
         total = state["total_units"]
 
-        # --- checkpoint: tell the monitor how far we have got ---
         send_json({
             "type": "TASK_PROGRESS",
             "node_id": node_name,
