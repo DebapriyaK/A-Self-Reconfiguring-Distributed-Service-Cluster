@@ -45,16 +45,16 @@ def load_and_run(module_filename):
 
 def main():
     print()
-    print("╔══════════════════════════════════════════════════════════╗")
-    print("║     Self-Reconfiguring Cluster — Full Test Suite         ║")
-    print("╚══════════════════════════════════════════════════════════╝")
+    print("=" * 62)
+    print("   Self-Reconfiguring Cluster -- Full Test Suite")
+    print("=" * 62)
     print()
-    print("Tests run sequentially. Total runtime ≈ 2.5 minutes.")
+    print("Tests run sequentially. Total runtime ~2.5 minutes.")
     print()
 
     results = []
     for label, module in TESTS:
-        print(f"▶  Starting {label}")
+        print(f">> Starting {label}")
         print("-" * 62)
         try:
             load_and_run(module)
@@ -67,11 +67,11 @@ def main():
         time.sleep(2)
 
     print()
-    print("╔══════════════════════════════════════════════════════════╗")
-    print("║                     SUITE SUMMARY                       ║")
-    print("╚══════════════════════════════════════════════════════════╝")
+    print("=" * 62)
+    print("                    SUITE SUMMARY")
+    print("=" * 62)
     for label, status in results:
-        print(f"  {label}  →  {status}")
+        print(f"  {label}  ->  {status}")
     print()
 
 

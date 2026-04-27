@@ -131,7 +131,7 @@ def run():
     else:
         print("  WARN  Could not read queue depth during outage.")
 
-    if "[JOINED] Node nodeD joined." in logs:
+    if "[JOINED] Node nodeD joined" in logs:
         print("  PASS  nodeD successfully joined the cluster after outage.")
     else:
         print("  FAIL  nodeD did not join the cluster.")

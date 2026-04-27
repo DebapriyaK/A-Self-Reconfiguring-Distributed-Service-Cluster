@@ -93,7 +93,7 @@ def least_loaded_alive_node():
     candidates = [
         (node_id, node_state["load"])
         for node_id, node_state in active_nodes.items()
-        if node_state["load"] < node_state.get("capacity", MAX_IN_FLIGHT_PER_NODE)
+        if node_state["load"] < min(node_state.get("capacity", MAX_IN_FLIGHT_PER_NODE), MAX_IN_FLIGHT_PER_NODE)
     ]
     if not candidates:
         return None

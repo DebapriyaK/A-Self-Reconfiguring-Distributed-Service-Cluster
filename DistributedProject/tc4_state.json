@@ -1,0 +1,36 @@
+{
+  "active_nodes": {
+    "nodeA": {
+      "last_seen": 1777293436.8504436,
+      "addr": [
+        "127.0.0.1",
+        64959
+      ],
+      "load": 1,
+      "capacity": 2
+    },
+    "nodeB": {
+      "last_seen": 1777293436.8501694,
+      "addr": [
+        "127.0.0.1",
+        64960
+      ],
+      "load": 1,
+      "capacity": 2
+    },
+    "nodeC": {
+      "last_seen": 1777293436.850199,
+      "addr": [
+        "127.0.0.1",
+        64961
+      ],
+      "load": 1,
+      "capacity": 2
+    }
+  },
+  "pending_count": 16,
+  "in_flight_count": 3,
+  "completed_count": 22,
+  "failed_count": 0,
+  "timestamp": 1777293437.863313
+}

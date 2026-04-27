@@ -106,7 +106,7 @@ def run():
     print("=" * 62)
     print("TEST CASE 4 — Load Balancing (Least-Connections Algorithm)")
     print("=" * 62)
-    print(f"  Total completed tasks: {total_completed}")
+    print(f"  Total completed tasks: {sum(per_node.values())}")
     print(f"  Completions per node: {per_node}")
     print()
 

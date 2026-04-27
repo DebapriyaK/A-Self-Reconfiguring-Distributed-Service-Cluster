@@ -6,7 +6,7 @@ Scenario:
     TASK-0003 (work_units=4, 2s per unit = 8s total) is assigned to nodeC.
     nodeC processes the task unit by unit, sending a TASK_PROGRESS checkpoint
     to the monitor after each unit.
-    nodeC crashes at 8.5 seconds -- after completing 3 of the 4 units.
+    nodeC crashes at t=10.5 -- after completing 3 of the 4 units.
     The monitor's last recorded checkpoint for TASK-0003 is units_done=3.
 
 What this proves:
@@ -25,14 +25,14 @@ Why this matters (conceptually):
     MapReduce, Apache Spark, and most production distributed job schedulers.
 
 Timing:
-    nodeC starts at ~t=0.5. TASK-0003 assigned at ~t=2.5.
+    nodeC starts at t=0.5. TASK-0003 assigned at t=3.0 (3rd task, 1s interval).
     With WORK_UNIT_DURATION=2.0s:
-        unit 1 done at ~t=4.5  -> TASK_PROGRESS(units_done=1)
-        unit 2 done at ~t=6.5  -> TASK_PROGRESS(units_done=2)
-        unit 3 done at ~t=8.5  -> TASK_PROGRESS(units_done=3)
-        nodeC crashes at CRASH_AFTER_SECONDS=8 from node start (~t=8.5 absolute)
-        unit 4 would be at ~t=10.5 -- never reached.
-    Monitor detects failure at ~t=12.5 (crash + 4s heartbeat timeout).
+        unit 1 done at t=5.0  -> TASK_PROGRESS(units_done=1)
+        unit 2 done at t=7.0  -> TASK_PROGRESS(units_done=2)
+        unit 3 done at t=9.0  -> TASK_PROGRESS(units_done=3)
+        nodeC crashes at CRASH_AFTER_SECONDS=10 from node start (t=10.5 absolute)
+        unit 4 would be at t=11.0 -- never reached (crash at t=10.5).
+    Monitor detects failure at t=14.5 (crash + 4s heartbeat timeout).
     Requeue with work_units=1. Healthy node finishes in 2s more.
 
 Expected log markers:
@@ -40,7 +40,7 @@ Expected log markers:
     [CHECKPOINT] TASK-0003 on nodeC: 2/4 units done.
     [CHECKPOINT] TASK-0003 on nodeC: 3/4 units done.
     [FAILURE] Node nodeC timed out.
-    [RECOVERY] Requeued TASK-0003 from failed node nodeC. (3/4 units done, 1 remaining)
+    [RECOVERY] Requeued TASK-0003 from failed node nodeC. (3/4 units done, 1 remaining, retry 1/3)
     [DONE] TASK-0003 finished by nodeA (or nodeB).
 """
 
@@ -88,19 +88,21 @@ def run():
         env["MONITOR_HOST"] = "127.0.0.1"
         env["WORK_UNIT_DURATION_SECONDS"] = "2.0"
         if name == "nodeC":
-            env["CRASH_AFTER_SECONDS"] = "8"
+            env["CRASH_AFTER_SECONDS"] = "10"
         node_processes.append(
             start_monitored([sys.executable, "-u", "node.py"], env, ROOT, [])
         )
 
     # Timeline:
     #   t=0.5  : nodes start
-    #   t=2.5  : TASK-0003 assigned to nodeC
-    #   t=4.5  : nodeC finishes unit 1 -> CHECKPOINT(1/4)
-    #   t=6.5  : nodeC finishes unit 2 -> CHECKPOINT(2/4)
-    #   t=8.5  : nodeC finishes unit 3 -> CHECKPOINT(3/4), then crashes
-    #   t=12.5 : monitor detects nodeC timeout, requeues 1 remaining unit
-    #   t=14.5 : healthy node completes the final unit
+    #   t=3.0  : TASK-0003 assigned to nodeC (3rd task at 1s interval)
+    #   t=5.0  : nodeC finishes unit 1 -> CHECKPOINT(1/4)
+    #   t=7.0  : nodeC finishes unit 2 -> CHECKPOINT(2/4)
+    #   t=9.0  : nodeC finishes unit 3 -> CHECKPOINT(3/4)
+    #   t=10.5 : nodeC crashes (CRASH_AFTER_SECONDS=10 from node start at t=0.5)
+    #   t=11.0 : unit 4 would have been here -- never reached
+    #   t=14.5 : monitor detects nodeC timeout, requeues 1 remaining unit
+    #   t=16.5 : healthy node completes the final unit
     print("Running test... (28 seconds)")
     time.sleep(28)
 
