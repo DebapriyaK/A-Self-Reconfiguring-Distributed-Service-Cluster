@@ -42,9 +42,16 @@ last_task_generated_at = 0.0
 last_liveness_check_at = 0.0
 last_summary_at = 0.0
 
+monitor_start_at = time.time()
+
 
 def now() -> float:
     return time.time()
+
+
+def log(msg):
+    elapsed = time.time() - monitor_start_at
+    print(f"[t={elapsed:7.2f}s] {msg}")
 
 
 def send_json(addr, payload):
@@ -73,7 +80,7 @@ def enqueue_task():
         "retries": 0,
     }
     pending_tasks.append(task)
-    print(
+    log(
         f"[INGRESS] Received new workload {task['task_id']} "
         f"(work_units={task['work_units']}). Queue={len(pending_tasks)}"
     )
@@ -120,7 +127,7 @@ def assign_tasks():
             node_state["addr"],
             {"type": "TASK_ASSIGN", "task_id": task["task_id"], "work_units": task["work_units"]},
         )
-        print(
+        log(
             f"[BALANCER] Assigned {task['task_id']} to {node_id} "
             f"(work_units={task['work_units']}, node_load={node_state['load']}, "
             f"queue={len(pending_tasks)})"
@@ -140,9 +147,9 @@ def fail_node(node_id, graceful=False):
       - If remaining == 0: all units done but TASK_DONE was lost. Count as complete.
     """
     if graceful:
-        print(f"[LEAVING] Node {node_id} sent graceful shutdown. Reassigning tasks immediately.")
+        log(f"[LEAVING] Node {node_id} sent graceful shutdown. Reassigning tasks immediately.")
     else:
-        print(f"[FAILURE] Node {node_id} timed out. Starting autonomous reconfiguration.")
+        log(f"[FAILURE] Node {node_id} timed out. Starting autonomous reconfiguration.")
 
     stranded_task_ids = [
         task_id
@@ -163,7 +170,7 @@ def fail_node(node_id, graceful=False):
                 "node_id": node_id,
                 "finished_at": now(),
             })
-            print(
+            log(
                 f"[RECOVERY] {task_id}: all {original_task['work_units']} units were done "
                 f"on {node_id} before crash. Marking complete."
             )
@@ -173,7 +180,7 @@ def fail_node(node_id, graceful=False):
                 "reason": f"exceeded {MAX_RETRIES} retries",
                 "failed_at": now(),
             })
-            print(
+            log(
                 f"[FAILED] {task_id}: exceeded {MAX_RETRIES} retries. Task permanently failed."
             )
         else:
@@ -183,14 +190,14 @@ def fail_node(node_id, graceful=False):
                 "retries": retries + 1,
             }
             pending_tasks.appendleft(partial_task)
-            print(
+            log(
                 f"[RECOVERY] Requeued {task_id} from failed node {node_id}. "
                 f"({units_done}/{original_task['work_units']} units done, "
                 f"{remaining} remaining, retry {retries + 1}/{MAX_RETRIES})"
             )
 
     del active_nodes[node_id]
-    print(f"[RECONFIGURED] Cluster size={len(active_nodes)}. Queue={len(pending_tasks)}.")
+    log(f"[RECONFIGURED] Cluster size={len(active_nodes)}. Queue={len(pending_tasks)}.")
 
 
 def check_liveness():
@@ -226,7 +233,7 @@ def check_liveness():
                 "reason": "assign timeout, max retries exceeded",
                 "failed_at": now(),
             })
-            print(f"[FAILED] {task_id}: TASK_ASSIGN timed out after {MAX_RETRIES} retries.")
+            log(f"[FAILED] {task_id}: TASK_ASSIGN timed out after {MAX_RETRIES} retries.")
         else:
             retry_task = {
                 "task_id": task_id,
@@ -234,7 +241,7 @@ def check_liveness():
                 "retries": retries + 1,
             }
             pending_tasks.appendleft(retry_task)
-            print(
+            log(
                 f"[ASSIGN-TIMEOUT] {task_id} on {node_id}: no progress after "
                 f"{TASK_ASSIGN_TIMEOUT_SECONDS}s. Requeuing (retry {retries + 1}/{MAX_RETRIES})."
             )
@@ -256,7 +263,7 @@ def handle_message(raw_data, addr):
                 "load": observed_load,
                 "capacity": capacity,
             }
-            print(f"[JOINED] Node {node_id} joined (capacity={capacity}). Active nodes={len(active_nodes)}")
+            log(f"[JOINED] Node {node_id} joined (capacity={capacity}). Active nodes={len(active_nodes)}")
         else:
             node_state = active_nodes[node_id]
             node_state["last_seen"] = current
@@ -287,7 +294,7 @@ def handle_message(raw_data, addr):
         ):
             in_flight_tasks[task_id]["units_done"] = units_done
             total = in_flight_tasks[task_id]["task"]["work_units"]
-            print(
+            log(
                 f"[CHECKPOINT] {task_id} on {node_id}: "
                 f"{units_done}/{total} units done."
             )
@@ -297,24 +304,24 @@ def handle_message(raw_data, addr):
         node_id = message["node_id"]
         task_id = message["task_id"]
         if task_id not in in_flight_tasks:
-            print(f"[WARN] Completion for unknown task {task_id} from {node_id}. Ignoring.")
+            log(f"[WARN] Completion for unknown task {task_id} from {node_id}. Ignoring.")
             return
         task_state = in_flight_tasks.pop(task_id)
         if node_id in active_nodes:
             active_nodes[node_id]["load"] = max(0, active_nodes[node_id]["load"] - 1)
             active_nodes[node_id]["last_seen"] = current
         completed_tasks.append({"task_id": task_id, "node_id": node_id, "finished_at": current})
-        print(
+        log(
             f"[DONE] {task_id} finished by {node_id}. "
             f"Completed={len(completed_tasks)} InFlight={len(in_flight_tasks)}"
         )
         return
 
-    print(f"[WARN] Unknown message type {msg_type} from {addr}.")
+    log(f"[WARN] Unknown message type {msg_type} from {addr}.")
 
 
-print("--- SELF-RECONFIGURING CLUSTER MONITOR ONLINE ---")
-print(
+log("--- SELF-RECONFIGURING CLUSTER MONITOR ONLINE ---")
+log(
     f"[CONFIG] heartbeat_timeout={HEARTBEAT_TIMEOUT_SECONDS}s "
     f"task_interval={TASK_GENERATION_INTERVAL_SECONDS}s "
     f"max_in_flight_per_node={MAX_IN_FLIGHT_PER_NODE} "
@@ -346,7 +353,7 @@ while True:
 
     if current - last_summary_at >= 4.0:
         snapshot_state()
-        print(
+        log(
             f"[STATUS] nodes={len(active_nodes)} queue={len(pending_tasks)} "
             f"in_flight={len(in_flight_tasks)} completed={len(completed_tasks)} "
             f"failed={len(failed_tasks)}"
