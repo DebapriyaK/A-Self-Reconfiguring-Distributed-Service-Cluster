@@ -21,11 +21,12 @@ import time
 from pathlib import Path
 
 TESTS = [
-    ("TC1 — Single Node Failure Mid-Task",             "test_case_1_single_node_failure"),
-    ("TC2 — Two Nodes Crash Simultaneously",            "test_case_2_two_nodes_simultaneous_crash"),
-    ("TC3 — Full Outage Then New Node Joins",           "test_case_3_full_outage_and_recovery"),
-    ("TC4 — Load Balancing Verification",               "test_case_4_load_balancing"),
-    ("TC5 — Partial Task Recovery via Checkpointing",   "test_case_5_partial_task_recovery"),
+    ("TC1 -- Single Node Failure Mid-Task",             "test_case_1_single_node_failure"),
+    ("TC2 -- Two Nodes Crash Simultaneously",            "test_case_2_two_nodes_simultaneous_crash"),
+    ("TC3 -- Full Outage Then New Node Joins",           "test_case_3_full_outage_and_recovery"),
+    ("TC4 -- Load Balancing Verification",               "test_case_4_load_balancing"),
+    ("TC5 -- Partial Task Recovery via Checkpointing",   "test_case_5_partial_task_recovery"),
+    ("TC6 -- Graceful Node Shutdown (LEAVING message)",  "test_case_6_graceful_leaving"),
 ]
 
 HERE = Path(__file__).parent

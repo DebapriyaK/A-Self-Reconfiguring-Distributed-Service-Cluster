@@ -1,19 +1,19 @@
 {
   "active_nodes": {
     "nodeA": {
-      "last_seen": 1777347078.770676,
+      "last_seen": 1777348029.0790906,
       "addr": [
         "127.0.0.1",
-        58776
+        58504
       ],
       "load": 2,
       "capacity": 2
     },
     "nodeB": {
-      "last_seen": 1777347078.9885304,
+      "last_seen": 1777348029.079124,
       "addr": [
         "127.0.0.1",
-        58777
+        58505
       ],
       "load": 2,
       "capacity": 2
@@ -23,5 +23,5 @@
   "in_flight_count": 4,
   "completed_count": 16,
   "failed_count": 0,
-  "timestamp": 1777347079.7889934
+  "timestamp": 1777348030.1087308
 }

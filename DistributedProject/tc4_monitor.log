@@ -1,168 +1,168 @@
 [t=   0.00s] --- SELF-RECONFIGURING CLUSTER MONITOR ONLINE ---
 [t=   0.00s] [CONFIG] heartbeat_timeout=5.0s task_interval=0.4s max_in_flight_per_node=1 max_retries=3
-[t=   0.50s] [INGRESS] Received new workload TASK-0001 (work_units=2). Queue=1
-[t=   0.50s] [STATUS] nodes=0 queue=1 in_flight=0 completed=0 failed=0
-[t=   0.54s] [JOINED] Node nodeA joined (capacity=2). Active nodes=1
-[t=   0.54s] [INGRESS] Received new workload TASK-0002 (work_units=3). Queue=2
-[t=   0.54s] [BALANCER] Assigned TASK-0001 to nodeA (work_units=2, node_load=1, queue=1)
-[t=   0.55s] [JOINED] Node nodeB joined (capacity=2). Active nodes=2
-[t=   0.55s] [BALANCER] Assigned TASK-0002 to nodeB (work_units=3, node_load=1, queue=0)
-[t=   0.56s] [JOINED] Node nodeC joined (capacity=2). Active nodes=3
-[t=   1.56s] [INGRESS] Received new workload TASK-0003 (work_units=4). Queue=1
-[t=   1.56s] [BALANCER] Assigned TASK-0003 to nodeC (work_units=4, node_load=1, queue=0)
-[t=   1.56s] [INGRESS] Received new workload TASK-0004 (work_units=1). Queue=1
-[t=   1.57s] [CHECKPOINT] TASK-0001 on nodeA: 1/2 units done.
-[t=   1.58s] [CHECKPOINT] TASK-0002 on nodeB: 1/3 units done.
-[t=   2.60s] [INGRESS] Received new workload TASK-0005 (work_units=2). Queue=2
-[t=   2.60s] [CHECKPOINT] TASK-0001 on nodeA: 2/2 units done.
-[t=   2.60s] [INGRESS] Received new workload TASK-0006 (work_units=3). Queue=3
-[t=   2.60s] [CHECKPOINT] TASK-0003 on nodeC: 1/4 units done.
-[t=   2.60s] [DONE] TASK-0001 finished by nodeA. Completed=1 InFlight=2
-[t=   2.60s] [BALANCER] Assigned TASK-0004 to nodeA (work_units=1, node_load=1, queue=2)
-[t=   2.63s] [CHECKPOINT] TASK-0002 on nodeB: 2/3 units done.
-[t=   3.63s] [CHECKPOINT] TASK-0003 on nodeC: 2/4 units done.
-[t=   3.63s] [INGRESS] Received new workload TASK-0007 (work_units=4). Queue=3
-[t=   3.63s] [CHECKPOINT] TASK-0004 on nodeA: 1/1 units done.
-[t=   3.63s] [INGRESS] Received new workload TASK-0008 (work_units=1). Queue=4
-[t=   3.63s] [DONE] TASK-0004 finished by nodeA. Completed=2 InFlight=2
-[t=   3.63s] [BALANCER] Assigned TASK-0005 to nodeA (work_units=2, node_load=1, queue=3)
-[t=   3.66s] [CHECKPOINT] TASK-0002 on nodeB: 3/3 units done.
-[t=   3.66s] [DONE] TASK-0002 finished by nodeB. Completed=3 InFlight=2
-[t=   3.66s] [BALANCER] Assigned TASK-0006 to nodeB (work_units=3, node_load=1, queue=2)
-[t=   4.65s] [CHECKPOINT] TASK-0005 on nodeA: 1/2 units done.
-[t=   4.65s] [INGRESS] Received new workload TASK-0009 (work_units=2). Queue=3
-[t=   4.65s] [STATUS] nodes=3 queue=3 in_flight=3 completed=3 failed=0
-[t=   4.65s] [CHECKPOINT] TASK-0003 on nodeC: 3/4 units done.
-[t=   4.65s] [INGRESS] Received new workload TASK-0010 (work_units=3). Queue=4
-[t=   4.70s] [CHECKPOINT] TASK-0006 on nodeB: 1/3 units done.
-[t=   5.71s] [INGRESS] Received new workload TASK-0011 (work_units=4). Queue=5
-[t=   5.71s] [CHECKPOINT] TASK-0003 on nodeC: 4/4 units done.
-[t=   5.71s] [INGRESS] Received new workload TASK-0012 (work_units=1). Queue=6
-[t=   5.71s] [DONE] TASK-0003 finished by nodeC. Completed=4 InFlight=2
-[t=   5.71s] [BALANCER] Assigned TASK-0007 to nodeC (work_units=4, node_load=1, queue=5)
-[t=   5.71s] [CHECKPOINT] TASK-0005 on nodeA: 2/2 units done.
-[t=   5.71s] [DONE] TASK-0005 finished by nodeA. Completed=5 InFlight=2
-[t=   5.71s] [BALANCER] Assigned TASK-0008 to nodeA (work_units=1, node_load=1, queue=4)
-[t=   5.74s] [CHECKPOINT] TASK-0006 on nodeB: 2/3 units done.
-[t=   6.74s] [CHECKPOINT] TASK-0008 on nodeA: 1/1 units done.
-[t=   6.74s] [INGRESS] Received new workload TASK-0013 (work_units=2). Queue=5
-[t=   6.74s] [CHECKPOINT] TASK-0007 on nodeC: 1/4 units done.
-[t=   6.74s] [INGRESS] Received new workload TASK-0014 (work_units=3). Queue=6
-[t=   6.74s] [DONE] TASK-0008 finished by nodeA. Completed=6 InFlight=2
-[t=   6.74s] [BALANCER] Assigned TASK-0009 to nodeA (work_units=2, node_load=1, queue=5)
-[t=   6.77s] [CHECKPOINT] TASK-0006 on nodeB: 3/3 units done.
-[t=   6.77s] [DONE] TASK-0006 finished by nodeB. Completed=7 InFlight=2
-[t=   6.77s] [BALANCER] Assigned TASK-0010 to nodeB (work_units=3, node_load=1, queue=4)
-[t=   7.76s] [CHECKPOINT] TASK-0009 on nodeA: 1/2 units done.
-[t=   7.76s] [INGRESS] Received new workload TASK-0015 (work_units=4). Queue=5
-[t=   7.76s] [CHECKPOINT] TASK-0007 on nodeC: 2/4 units done.
-[t=   7.76s] [INGRESS] Received new workload TASK-0016 (work_units=1). Queue=6
-[t=   7.83s] [CHECKPOINT] TASK-0010 on nodeB: 1/3 units done.
-[t=   8.81s] [CHECKPOINT] TASK-0007 on nodeC: 3/4 units done.
-[t=   8.81s] [INGRESS] Received new workload TASK-0017 (work_units=2). Queue=7
-[t=   8.81s] [STATUS] nodes=3 queue=7 in_flight=3 completed=7 failed=0
+[t=   0.49s] [JOINED] Node nodeA joined (capacity=2). Active nodes=1
+[t=   0.49s] [INGRESS] Received new workload TASK-0001 (work_units=2). Queue=1
+[t=   0.49s] [BALANCER] Assigned TASK-0001 to nodeA (work_units=2, node_load=1, queue=0)
+[t=   0.50s] [STATUS] nodes=1 queue=0 in_flight=1 completed=0 failed=0
+[t=   0.50s] [JOINED] Node nodeB joined (capacity=2). Active nodes=2
+[t=   0.50s] [INGRESS] Received new workload TASK-0002 (work_units=3). Queue=1
+[t=   0.50s] [BALANCER] Assigned TASK-0002 to nodeB (work_units=3, node_load=1, queue=0)
+[t=   0.50s] [JOINED] Node nodeC joined (capacity=2). Active nodes=3
+[t=   1.53s] [INGRESS] Received new workload TASK-0003 (work_units=4). Queue=1
+[t=   1.53s] [BALANCER] Assigned TASK-0003 to nodeC (work_units=4, node_load=1, queue=0)
+[t=   1.53s] [INGRESS] Received new workload TASK-0004 (work_units=1). Queue=1
+[t=   1.54s] [CHECKPOINT] TASK-0002 on nodeB: 1/3 units done.
+[t=   1.54s] [CHECKPOINT] TASK-0001 on nodeA: 1/2 units done.
+[t=   2.55s] [INGRESS] Received new workload TASK-0005 (work_units=2). Queue=2
+[t=   2.55s] [CHECKPOINT] TASK-0003 on nodeC: 1/4 units done.
+[t=   2.55s] [INGRESS] Received new workload TASK-0006 (work_units=3). Queue=3
+[t=   2.56s] [CHECKPOINT] TASK-0001 on nodeA: 2/2 units done.
+[t=   2.56s] [DONE] TASK-0001 finished by nodeA. Completed=1 InFlight=2
+[t=   2.56s] [BALANCER] Assigned TASK-0004 to nodeA (work_units=1, node_load=1, queue=2)
+[t=   2.56s] [CHECKPOINT] TASK-0002 on nodeB: 2/3 units done.
+[t=   3.58s] [CHECKPOINT] TASK-0003 on nodeC: 2/4 units done.
+[t=   3.58s] [INGRESS] Received new workload TASK-0007 (work_units=4). Queue=3
+[t=   3.58s] [INGRESS] Received new workload TASK-0008 (work_units=1). Queue=4
+[t=   3.60s] [CHECKPOINT] TASK-0002 on nodeB: 3/3 units done.
+[t=   3.60s] [CHECKPOINT] TASK-0004 on nodeA: 1/1 units done.
+[t=   3.60s] [DONE] TASK-0004 finished by nodeA. Completed=2 InFlight=2
+[t=   3.60s] [BALANCER] Assigned TASK-0005 to nodeA (work_units=2, node_load=1, queue=3)
+[t=   3.60s] [DONE] TASK-0002 finished by nodeB. Completed=3 InFlight=2
+[t=   3.60s] [BALANCER] Assigned TASK-0006 to nodeB (work_units=3, node_load=1, queue=2)
+[t=   4.61s] [INGRESS] Received new workload TASK-0009 (work_units=2). Queue=3
+[t=   4.61s] [STATUS] nodes=3 queue=3 in_flight=3 completed=3 failed=0
+[t=   4.62s] [CHECKPOINT] TASK-0003 on nodeC: 3/4 units done.
+[t=   4.62s] [INGRESS] Received new workload TASK-0010 (work_units=3). Queue=4
+[t=   4.64s] [CHECKPOINT] TASK-0005 on nodeA: 1/2 units done.
+[t=   4.64s] [CHECKPOINT] TASK-0006 on nodeB: 1/3 units done.
+[t=   5.64s] [INGRESS] Received new workload TASK-0011 (work_units=4). Queue=5
+[t=   5.64s] [CHECKPOINT] TASK-0003 on nodeC: 4/4 units done.
+[t=   5.64s] [INGRESS] Received new workload TASK-0012 (work_units=1). Queue=6
+[t=   5.65s] [DONE] TASK-0003 finished by nodeC. Completed=4 InFlight=2
+[t=   5.65s] [BALANCER] Assigned TASK-0007 to nodeC (work_units=4, node_load=1, queue=5)
+[t=   5.66s] [CHECKPOINT] TASK-0006 on nodeB: 2/3 units done.
+[t=   5.66s] [CHECKPOINT] TASK-0005 on nodeA: 2/2 units done.
+[t=   5.66s] [DONE] TASK-0005 finished by nodeA. Completed=5 InFlight=2
+[t=   5.66s] [BALANCER] Assigned TASK-0008 to nodeA (work_units=1, node_load=1, queue=4)
+[t=   6.66s] [CHECKPOINT] TASK-0007 on nodeC: 1/4 units done.
+[t=   6.66s] [INGRESS] Received new workload TASK-0013 (work_units=2). Queue=5
+[t=   6.66s] [INGRESS] Received new workload TASK-0014 (work_units=3). Queue=6
+[t=   6.71s] [CHECKPOINT] TASK-0006 on nodeB: 3/3 units done.
+[t=   6.71s] [CHECKPOINT] TASK-0008 on nodeA: 1/1 units done.
+[t=   6.71s] [DONE] TASK-0008 finished by nodeA. Completed=6 InFlight=2
+[t=   6.71s] [BALANCER] Assigned TASK-0009 to nodeA (work_units=2, node_load=1, queue=5)
+[t=   6.71s] [DONE] TASK-0006 finished by nodeB. Completed=7 InFlight=2
+[t=   6.71s] [BALANCER] Assigned TASK-0010 to nodeB (work_units=3, node_load=1, queue=4)
+[t=   7.69s] [CHECKPOINT] TASK-0007 on nodeC: 2/4 units done.
+[t=   7.70s] [INGRESS] Received new workload TASK-0015 (work_units=4). Queue=5
+[t=   7.70s] [INGRESS] Received new workload TASK-0016 (work_units=1). Queue=6
+[t=   7.75s] [CHECKPOINT] TASK-0010 on nodeB: 1/3 units done.
+[t=   7.75s] [CHECKPOINT] TASK-0009 on nodeA: 1/2 units done.
+[t=   8.74s] [CHECKPOINT] TASK-0007 on nodeC: 3/4 units done.
+[t=   8.74s] [INGRESS] Received new workload TASK-0017 (work_units=2). Queue=7
+[t=   8.74s] [STATUS] nodes=3 queue=7 in_flight=3 completed=7 failed=0
+[t=   8.74s] [INGRESS] Received new workload TASK-0018 (work_units=3). Queue=8
+[t=   8.81s] [CHECKPOINT] TASK-0010 on nodeB: 2/3 units done.
 [t=   8.81s] [CHECKPOINT] TASK-0009 on nodeA: 2/2 units done.
-[t=   8.81s] [INGRESS] Received new workload TASK-0018 (work_units=3). Queue=8
 [t=   8.81s] [DONE] TASK-0009 finished by nodeA. Completed=8 InFlight=2
 [t=   8.81s] [BALANCER] Assigned TASK-0011 to nodeA (work_units=4, node_load=1, queue=7)
-[t=   8.88s] [CHECKPOINT] TASK-0010 on nodeB: 2/3 units done.
-[t=   9.83s] [CHECKPOINT] TASK-0007 on nodeC: 4/4 units done.
-[t=   9.83s] [INGRESS] Received new workload TASK-0019 (work_units=4). Queue=8
-[t=   9.83s] [DONE] TASK-0007 finished by nodeC. Completed=9 InFlight=2
-[t=   9.83s] [INGRESS] Received new workload TASK-0020 (work_units=1). Queue=9
-[t=   9.83s] [BALANCER] Assigned TASK-0012 to nodeC (work_units=1, node_load=1, queue=8)
-[t=   9.83s] [CHECKPOINT] TASK-0011 on nodeA: 1/4 units done.
-[t=   9.91s] [CHECKPOINT] TASK-0010 on nodeB: 3/3 units done.
-[t=   9.91s] [DONE] TASK-0010 finished by nodeB. Completed=10 InFlight=2
-[t=   9.91s] [BALANCER] Assigned TASK-0013 to nodeB (work_units=2, node_load=1, queue=7)
+[t=   9.81s] [CHECKPOINT] TASK-0007 on nodeC: 4/4 units done.
+[t=   9.81s] [INGRESS] Received new workload TASK-0019 (work_units=4). Queue=8
+[t=   9.81s] [DONE] TASK-0007 finished by nodeC. Completed=9 InFlight=2
+[t=   9.81s] [INGRESS] Received new workload TASK-0020 (work_units=1). Queue=9
+[t=   9.81s] [BALANCER] Assigned TASK-0012 to nodeC (work_units=1, node_load=1, queue=8)
+[t=   9.84s] [CHECKPOINT] TASK-0010 on nodeB: 3/3 units done.
+[t=   9.84s] [CHECKPOINT] TASK-0011 on nodeA: 1/4 units done.
+[t=   9.84s] [DONE] TASK-0010 finished by nodeB. Completed=10 InFlight=2
+[t=   9.84s] [BALANCER] Assigned TASK-0013 to nodeB (work_units=2, node_load=1, queue=7)
+[t=  10.83s] [CHECKPOINT] TASK-0012 on nodeC: 1/1 units done.
+[t=  10.83s] [INGRESS] Received new workload TASK-0021 (work_units=2). Queue=8
+[t=  10.83s] [DONE] TASK-0012 finished by nodeC. Completed=11 InFlight=2
+[t=  10.83s] [INGRESS] Received new workload TASK-0022 (work_units=3). Queue=9
+[t=  10.83s] [BALANCER] Assigned TASK-0014 to nodeC (work_units=3, node_load=1, queue=8)
 [t=  10.86s] [CHECKPOINT] TASK-0011 on nodeA: 2/4 units done.
-[t=  10.86s] [INGRESS] Received new workload TASK-0021 (work_units=2). Queue=8
-[t=  10.86s] [INGRESS] Received new workload TASK-0022 (work_units=3). Queue=9
-[t=  10.87s] [CHECKPOINT] TASK-0012 on nodeC: 1/1 units done.
-[t=  10.87s] [DONE] TASK-0012 finished by nodeC. Completed=11 InFlight=2
-[t=  10.87s] [BALANCER] Assigned TASK-0014 to nodeC (work_units=3, node_load=1, queue=8)
-[t=  10.94s] [CHECKPOINT] TASK-0013 on nodeB: 1/2 units done.
-[t=  11.89s] [CHECKPOINT] TASK-0011 on nodeA: 3/4 units done.
-[t=  11.89s] [INGRESS] Received new workload TASK-0023 (work_units=4). Queue=9
-[t=  11.89s] [INGRESS] Received new workload TASK-0024 (work_units=1). Queue=10
-[t=  11.92s] [CHECKPOINT] TASK-0014 on nodeC: 1/3 units done.
-[t=  11.98s] [CHECKPOINT] TASK-0013 on nodeB: 2/2 units done.
-[t=  11.98s] [DONE] TASK-0013 finished by nodeB. Completed=12 InFlight=2
-[t=  11.98s] [BALANCER] Assigned TASK-0015 to nodeB (work_units=4, node_load=1, queue=9)
-[t=  12.92s] [CHECKPOINT] TASK-0011 on nodeA: 4/4 units done.
-[t=  12.92s] [INGRESS] Received new workload TASK-0025 (work_units=2). Queue=10
-[t=  12.92s] [STATUS] nodes=3 queue=10 in_flight=3 completed=12 failed=0
+[t=  10.86s] [CHECKPOINT] TASK-0013 on nodeB: 1/2 units done.
+[t=  11.86s] [CHECKPOINT] TASK-0014 on nodeC: 1/3 units done.
+[t=  11.86s] [INGRESS] Received new workload TASK-0023 (work_units=4). Queue=9
+[t=  11.86s] [INGRESS] Received new workload TASK-0024 (work_units=1). Queue=10
+[t=  11.91s] [CHECKPOINT] TASK-0011 on nodeA: 3/4 units done.
+[t=  11.91s] [CHECKPOINT] TASK-0013 on nodeB: 2/2 units done.
+[t=  11.91s] [DONE] TASK-0013 finished by nodeB. Completed=12 InFlight=2
+[t=  11.91s] [BALANCER] Assigned TASK-0015 to nodeB (work_units=4, node_load=1, queue=9)
+[t=  12.89s] [CHECKPOINT] TASK-0014 on nodeC: 2/3 units done.
+[t=  12.89s] [INGRESS] Received new workload TASK-0025 (work_units=2). Queue=10
+[t=  12.89s] [STATUS] nodes=3 queue=10 in_flight=3 completed=12 failed=0
+[t=  12.89s] [INGRESS] Received new workload TASK-0026 (work_units=3). Queue=11
+[t=  12.93s] [CHECKPOINT] TASK-0011 on nodeA: 4/4 units done.
+[t=  12.93s] [CHECKPOINT] TASK-0015 on nodeB: 1/4 units done.
 [t=  12.93s] [DONE] TASK-0011 finished by nodeA. Completed=13 InFlight=2
-[t=  12.93s] [INGRESS] Received new workload TASK-0026 (work_units=3). Queue=11
 [t=  12.93s] [BALANCER] Assigned TASK-0016 to nodeA (work_units=1, node_load=1, queue=10)
-[t=  12.94s] [CHECKPOINT] TASK-0014 on nodeC: 2/3 units done.
-[t=  13.02s] [CHECKPOINT] TASK-0015 on nodeB: 1/4 units done.
-[t=  13.94s] [CHECKPOINT] TASK-0016 on nodeA: 1/1 units done.
-[t=  13.94s] [INGRESS] Received new workload TASK-0027 (work_units=4). Queue=11
-[t=  13.94s] [DONE] TASK-0016 finished by nodeA. Completed=14 InFlight=2
-[t=  13.94s] [INGRESS] Received new workload TASK-0028 (work_units=1). Queue=12
-[t=  13.94s] [BALANCER] Assigned TASK-0017 to nodeA (work_units=2, node_load=1, queue=11)
-[t=  13.97s] [CHECKPOINT] TASK-0014 on nodeC: 3/3 units done.
-[t=  13.97s] [DONE] TASK-0014 finished by nodeC. Completed=15 InFlight=2
-[t=  13.97s] [BALANCER] Assigned TASK-0018 to nodeC (work_units=3, node_load=1, queue=10)
-[t=  14.07s] [CHECKPOINT] TASK-0015 on nodeB: 2/4 units done.
-[t=  14.96s] [CHECKPOINT] TASK-0017 on nodeA: 1/2 units done.
-[t=  14.96s] [INGRESS] Received new workload TASK-0029 (work_units=2). Queue=11
-[t=  15.01s] [CHECKPOINT] TASK-0018 on nodeC: 1/3 units done.
-[t=  15.01s] [INGRESS] Received new workload TASK-0030 (work_units=3). Queue=12
-[t=  15.10s] [CHECKPOINT] TASK-0015 on nodeB: 3/4 units done.
-[t=  15.99s] [CHECKPOINT] TASK-0017 on nodeA: 2/2 units done.
-[t=  15.99s] [INGRESS] Received new workload TASK-0031 (work_units=4). Queue=13
-[t=  15.99s] [DONE] TASK-0017 finished by nodeA. Completed=16 InFlight=2
-[t=  15.99s] [BALANCER] Assigned TASK-0019 to nodeA (work_units=4, node_load=1, queue=12)
-[t=  16.04s] [CHECKPOINT] TASK-0018 on nodeC: 2/3 units done.
-[t=  16.04s] [INGRESS] Received new workload TASK-0032 (work_units=1). Queue=13
-[t=  16.13s] [CHECKPOINT] TASK-0015 on nodeB: 4/4 units done.
-[t=  16.13s] [DONE] TASK-0015 finished by nodeB. Completed=17 InFlight=2
-[t=  16.13s] [BALANCER] Assigned TASK-0020 to nodeB (work_units=1, node_load=1, queue=12)
-[t=  17.03s] [CHECKPOINT] TASK-0019 on nodeA: 1/4 units done.
+[t=  13.93s] [CHECKPOINT] TASK-0014 on nodeC: 3/3 units done.
+[t=  13.93s] [INGRESS] Received new workload TASK-0027 (work_units=4). Queue=11
+[t=  13.93s] [DONE] TASK-0014 finished by nodeC. Completed=14 InFlight=2
+[t=  13.93s] [INGRESS] Received new workload TASK-0028 (work_units=1). Queue=12
+[t=  13.93s] [BALANCER] Assigned TASK-0017 to nodeC (work_units=2, node_load=1, queue=11)
+[t=  13.95s] [CHECKPOINT] TASK-0015 on nodeB: 2/4 units done.
+[t=  13.95s] [CHECKPOINT] TASK-0016 on nodeA: 1/1 units done.
+[t=  13.95s] [DONE] TASK-0016 finished by nodeA. Completed=15 InFlight=2
+[t=  13.95s] [BALANCER] Assigned TASK-0018 to nodeA (work_units=3, node_load=1, queue=10)
+[t=  14.95s] [CHECKPOINT] TASK-0017 on nodeC: 1/2 units done.
+[t=  14.95s] [INGRESS] Received new workload TASK-0029 (work_units=2). Queue=11
+[t=  14.95s] [INGRESS] Received new workload TASK-0030 (work_units=3). Queue=12
+[t=  14.97s] [CHECKPOINT] TASK-0018 on nodeA: 1/3 units done.
+[t=  14.97s] [CHECKPOINT] TASK-0015 on nodeB: 3/4 units done.
+[t=  15.98s] [INGRESS] Received new workload TASK-0031 (work_units=4). Queue=13
+[t=  16.01s] [CHECKPOINT] TASK-0017 on nodeC: 2/2 units done.
+[t=  16.01s] [INGRESS] Received new workload TASK-0032 (work_units=1). Queue=14
+[t=  16.01s] [CHECKPOINT] TASK-0015 on nodeB: 4/4 units done.
+[t=  16.01s] [CHECKPOINT] TASK-0018 on nodeA: 2/3 units done.
+[t=  16.01s] [DONE] TASK-0017 finished by nodeC. Completed=16 InFlight=2
+[t=  16.01s] [BALANCER] Assigned TASK-0019 to nodeC (work_units=4, node_load=1, queue=13)
+[t=  16.01s] [DONE] TASK-0015 finished by nodeB. Completed=17 InFlight=2
+[t=  16.01s] [BALANCER] Assigned TASK-0020 to nodeB (work_units=1, node_load=1, queue=12)
 [t=  17.03s] [INGRESS] Received new workload TASK-0033 (work_units=2). Queue=13
 [t=  17.03s] [STATUS] nodes=3 queue=13 in_flight=3 completed=17 failed=0
-[t=  17.08s] [CHECKPOINT] TASK-0018 on nodeC: 3/3 units done.
-[t=  17.08s] [DONE] TASK-0018 finished by nodeC. Completed=18 InFlight=2
-[t=  17.08s] [INGRESS] Received new workload TASK-0034 (work_units=3). Queue=14
-[t=  17.08s] [BALANCER] Assigned TASK-0021 to nodeC (work_units=2, node_load=1, queue=13)
-[t=  17.16s] [CHECKPOINT] TASK-0020 on nodeB: 1/1 units done.
-[t=  17.16s] [DONE] TASK-0020 finished by nodeB. Completed=19 InFlight=2
-[t=  17.16s] [BALANCER] Assigned TASK-0022 to nodeB (work_units=3, node_load=1, queue=12)
-[t=  18.06s] [CHECKPOINT] TASK-0019 on nodeA: 2/4 units done.
+[t=  17.04s] [CHECKPOINT] TASK-0020 on nodeB: 1/1 units done.
+[t=  17.04s] [INGRESS] Received new workload TASK-0034 (work_units=3). Queue=14
+[t=  17.04s] [DONE] TASK-0020 finished by nodeB. Completed=18 InFlight=2
+[t=  17.04s] [BALANCER] Assigned TASK-0021 to nodeB (work_units=2, node_load=1, queue=13)
+[t=  17.04s] [CHECKPOINT] TASK-0019 on nodeC: 1/4 units done.
+[t=  17.04s] [CHECKPOINT] TASK-0018 on nodeA: 3/3 units done.
+[t=  17.04s] [DONE] TASK-0018 finished by nodeA. Completed=19 InFlight=2
+[t=  17.04s] [BALANCER] Assigned TASK-0022 to nodeA (work_units=3, node_load=1, queue=12)
 [t=  18.06s] [INGRESS] Received new workload TASK-0035 (work_units=4). Queue=13
-[t=  18.11s] [CHECKPOINT] TASK-0021 on nodeC: 1/2 units done.
-[t=  18.11s] [INGRESS] Received new workload TASK-0036 (work_units=1). Queue=14
-[t=  18.19s] [CHECKPOINT] TASK-0022 on nodeB: 1/3 units done.
-[t=  19.09s] [CHECKPOINT] TASK-0019 on nodeA: 3/4 units done.
-[t=  19.09s] [INGRESS] Received new workload TASK-0037 (work_units=2). Queue=15
-[t=  19.14s] [CHECKPOINT] TASK-0021 on nodeC: 2/2 units done.
-[t=  19.14s] [DONE] TASK-0021 finished by nodeC. Completed=20 InFlight=2
-[t=  19.14s] [INGRESS] Received new workload TASK-0038 (work_units=3). Queue=16
-[t=  19.14s] [BALANCER] Assigned TASK-0023 to nodeC (work_units=4, node_load=1, queue=15)
-[t=  19.24s] [CHECKPOINT] TASK-0022 on nodeB: 2/3 units done.
-[t=  20.11s] [CHECKPOINT] TASK-0019 on nodeA: 4/4 units done.
+[t=  18.06s] [CHECKPOINT] TASK-0019 on nodeC: 2/4 units done.
+[t=  18.06s] [INGRESS] Received new workload TASK-0036 (work_units=1). Queue=14
+[t=  18.06s] [CHECKPOINT] TASK-0022 on nodeA: 1/3 units done.
+[t=  18.06s] [CHECKPOINT] TASK-0021 on nodeB: 1/2 units done.
+[t=  19.08s] [INGRESS] Received new workload TASK-0037 (work_units=2). Queue=15
+[t=  19.10s] [CHECKPOINT] TASK-0021 on nodeB: 2/2 units done.
+[t=  19.10s] [INGRESS] Received new workload TASK-0038 (work_units=3). Queue=16
+[t=  19.10s] [DONE] TASK-0021 finished by nodeB. Completed=20 InFlight=2
+[t=  19.10s] [BALANCER] Assigned TASK-0023 to nodeB (work_units=4, node_load=1, queue=15)
+[t=  19.10s] [CHECKPOINT] TASK-0022 on nodeA: 2/3 units done.
+[t=  19.10s] [CHECKPOINT] TASK-0019 on nodeC: 3/4 units done.
 [t=  20.11s] [INGRESS] Received new workload TASK-0039 (work_units=4). Queue=16
-[t=  20.11s] [DONE] TASK-0019 finished by nodeA. Completed=21 InFlight=2
-[t=  20.11s] [BALANCER] Assigned TASK-0024 to nodeA (work_units=1, node_load=1, queue=15)
-[t=  20.16s] [CHECKPOINT] TASK-0023 on nodeC: 1/4 units done.
-[t=  20.16s] [INGRESS] Received new workload TASK-0040 (work_units=1). Queue=16
-[t=  20.27s] [CHECKPOINT] TASK-0022 on nodeB: 3/3 units done.
-[t=  20.27s] [DONE] TASK-0022 finished by nodeB. Completed=22 InFlight=2
-[t=  20.27s] [BALANCER] Assigned TASK-0025 to nodeB (work_units=2, node_load=1, queue=15)
-[t=  21.12s] [CHECKPOINT] TASK-0024 on nodeA: 1/1 units done.
-[t=  21.12s] [INGRESS] Received new workload TASK-0041 (work_units=2). Queue=16
-[t=  21.12s] [STATUS] nodes=3 queue=16 in_flight=3 completed=22 failed=0
-[t=  21.12s] [DONE] TASK-0024 finished by nodeA. Completed=23 InFlight=2
-[t=  21.12s] [BALANCER] Assigned TASK-0026 to nodeA (work_units=3, node_load=1, queue=15)
-[t=  21.21s] [CHECKPOINT] TASK-0023 on nodeC: 2/4 units done.
-[t=  21.21s] [INGRESS] Received new workload TASK-0042 (work_units=3). Queue=16
-[t=  21.30s] [CHECKPOINT] TASK-0025 on nodeB: 1/2 units done.
-[t=  22.17s] [CHECKPOINT] TASK-0026 on nodeA: 1/3 units done.
-[t=  22.17s] [INGRESS] Received new workload TASK-0043 (work_units=4). Queue=17
-[t=  22.26s] [CHECKPOINT] TASK-0023 on nodeC: 3/4 units done.
-[t=  22.26s] [INGRESS] Received new workload TASK-0044 (work_units=1). Queue=18
-[t=  22.34s] [CHECKPOINT] TASK-0025 on nodeB: 2/2 units done.
-[t=  22.34s] [DONE] TASK-0025 finished by nodeB. Completed=24 InFlight=2
-[t=  22.34s] [BALANCER] Assigned TASK-0027 to nodeB (work_units=4, node_load=1, queue=17)
+[t=  20.14s] [CHECKPOINT] TASK-0023 on nodeB: 1/4 units done.
+[t=  20.14s] [INGRESS] Received new workload TASK-0040 (work_units=1). Queue=17
+[t=  20.14s] [CHECKPOINT] TASK-0022 on nodeA: 3/3 units done.
+[t=  20.14s] [CHECKPOINT] TASK-0019 on nodeC: 4/4 units done.
+[t=  20.14s] [DONE] TASK-0019 finished by nodeC. Completed=21 InFlight=2
+[t=  20.14s] [BALANCER] Assigned TASK-0024 to nodeC (work_units=1, node_load=1, queue=16)
+[t=  20.14s] [DONE] TASK-0022 finished by nodeA. Completed=22 InFlight=2
+[t=  20.14s] [BALANCER] Assigned TASK-0025 to nodeA (work_units=2, node_load=1, queue=15)
+[t=  21.16s] [INGRESS] Received new workload TASK-0041 (work_units=2). Queue=16
+[t=  21.16s] [STATUS] nodes=3 queue=16 in_flight=3 completed=22 failed=0
+[t=  21.17s] [CHECKPOINT] TASK-0023 on nodeB: 2/4 units done.
+[t=  21.17s] [INGRESS] Received new workload TASK-0042 (work_units=3). Queue=17
+[t=  21.17s] [CHECKPOINT] TASK-0024 on nodeC: 1/1 units done.
+[t=  21.17s] [DONE] TASK-0024 finished by nodeC. Completed=23 InFlight=2
+[t=  21.17s] [BALANCER] Assigned TASK-0026 to nodeC (work_units=3, node_load=1, queue=16)
+[t=  21.19s] [CHECKPOINT] TASK-0025 on nodeA: 1/2 units done.
+[t=  22.19s] [INGRESS] Received new workload TASK-0043 (work_units=4). Queue=17
+[t=  22.19s] [CHECKPOINT] TASK-0023 on nodeB: 3/4 units done.
+[t=  22.19s] [INGRESS] Received new workload TASK-0044 (work_units=1). Queue=18
+[t=  22.19s] [CHECKPOINT] TASK-0026 on nodeC: 1/3 units done.
+[t=  22.23s] [CHECKPOINT] TASK-0025 on nodeA: 2/2 units done.
+[t=  22.23s] [DONE] TASK-0025 finished by nodeA. Completed=24 InFlight=2
+[t=  22.23s] [BALANCER] Assigned TASK-0027 to nodeA (work_units=4, node_load=1, queue=17)

@@ -1,18 +1,18 @@
 {
   "active_nodes": {
     "nodeD": {
-      "last_seen": 1777347026.3988664,
+      "last_seen": 1777347975.749126,
       "addr": [
         "127.0.0.1",
-        56180
+        53220
       ],
       "load": 2,
       "capacity": 2
     }
   },
-  "pending_count": 23,
+  "pending_count": 24,
   "in_flight_count": 2,
-  "completed_count": 9,
+  "completed_count": 8,
   "failed_count": 0,
-  "timestamp": 1777347026.3991122
+  "timestamp": 1777347976.7692213
 }
